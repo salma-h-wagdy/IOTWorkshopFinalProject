@@ -6,7 +6,7 @@
 #include <string.h>
 
 // constant interval to publish message
-#define TH 1000
+#define publish_interval 1000
 
 // insert correct credentials here
 #define ssid "ssid"
@@ -32,11 +32,11 @@ int ir_value = 0;
 
 // char* on="on";
 
-long long lastPubTime = 0;
+long long last_pub_time = 0;
 
 char str[16];
 
-int i = 0;
+
 
 // callback function at recieving a message from a topic that's been subscribed to, in this code that's the switch :D
 void callback(char topic[], byte *payload, unsigned int length)
@@ -46,7 +46,7 @@ void callback(char topic[], byte *payload, unsigned int length)
 
   Serial.print("Message:");
 
-  for (i = 0; i < length; i++)
+  for (int i = 0; i < length; i++)
   {
     str[i] = (char)payload[i];
   }
@@ -110,7 +110,7 @@ void setup()
   Serial.println("subscribed to ../switch");
 
   // to publish at set intervals
-  lastPubTime = millis();
+  last_pub_time = millis();
 }
 
 void loop()
@@ -119,7 +119,7 @@ void loop()
 
   // publish ir sensor state and print confirmation
 
-  if ((millis() - lastPubTime) >= TH)
+  if ((millis() - last_pub_time) >= publish_interval)
   {
     ir_value = digitalRead(IR_PIN);
 
@@ -128,7 +128,7 @@ void loop()
       if (client.publish("/sectorb5/salma/IR", noObj))
       {
 
-        Serial.println("publish 3 done?");
+        Serial.println("publish done");
       }
     }
 
@@ -137,10 +137,10 @@ void loop()
       if (client.publish("/sectorb5/salma/IR", obj))
       {
 
-        Serial.println("publish 3 done?");
+        Serial.println("publish done");
       }
     }
 
-    lastPubTime = millis();
+    last_pub_time = millis();
   }
 }
